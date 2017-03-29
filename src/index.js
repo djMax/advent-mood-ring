@@ -4,17 +4,9 @@ import pgp from 'pg-promise';
 import express from 'express';
 
 const PORT = process.env.PORT || 3000;
-const PGHOST = process.env.PGHOST || 'localhost';
-const PGUSER = process.env.PGUSER || 'docker';
-const PGPASSWORD = process.env.PGPASSWORD || 'postgis';
-const PGDB = process.env.PGDB || 'moodring';
+const PGURL = process.env.DATABASE_URL || 'postgres://docker:postgis@localhost:5432/moodring'
 
-const db = pgp({})({
-  host: PGHOST,
-  user: PGUSER,
-  password: PGPASSWORD,
-  database: PGDB,
-});
+const db = pgp({})(PGURL);
 
 const server = express()
   .use(express.static(path.join(__dirname, '..', 'static')))
