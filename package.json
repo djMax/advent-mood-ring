@@ -1,0 +1,26 @@
+{
+  "name": "advent-mood-ring",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node -r babel-register src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "websockets",
+    "esp8266"
+  ],
+  "author": "Max Metral <max@pyralis.com>",
+  "license": "MIT",
+  "dependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-core": "^6.24.0",
+    "babel-preset-gasbuddy": "^2.1.1",
+    "bufferutil": "3.0.0",
+    "express": "4.15.2",
+    "pg-promise": "^5.6.4",
+    "utf-8-validate": "3.0.1",
+    "ws": "2.2.2"
+  }
+}
