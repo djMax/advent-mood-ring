@@ -22,7 +22,28 @@ app.post('/update', async (req, res) => {
       req.body.instruction,
       req.body.id,
     ]);
-    res.sendStatus(200);
+  res.sendStatus(200);
+});
+
+function getAll() {
+  try {
+    return db.manyOrNone(`SELECT
+    pixel_id, instruction
+  FROM
+    "user" U JOIN instruction I ON U.user_id = I.user_id`);
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+app.get('/display', (req, res) => {
+  getAll()
+    .then(i => res.json(i))
+    .catch((e) => {
+      console.error(e);
+      res.sendStatus(500);
+    });
 });
 
 const wss = new WebSocket.Server({ server });
@@ -34,20 +55,16 @@ wss.on('connection', function connection(ws) {
     console.log('received: %s', message);
   });
 
-  pgp.manyOrNone(`SELECT
-    pixel_id, instruction
-  FROM
-    user JOIN instruction ON user.user_id = instruction.user_id`)
-    .then((users) => {
-      const parts = [];
-      users.forEach((i) => {
-        parts.push(user.pixel_id);
-        const bits = [];
-        user.instruction.flow.forEach((i) => {
-          bits.push(...i.color, i.ticks);
-        });
-        parts.push(bits.join(','));
+  getAll().then((users) => {
+    const parts = [];
+    users.forEach((i) => {
+      parts.push(user.pixel_id);
+      const bits = [];
+      user.instruction.flow.forEach((i) => {
+        bits.push(...i.color, i.ticks);
       });
-      ws.send(parts.join('\n'));
+      parts.push(bits.join(','));
     });
+    ws.send(parts.join('\n'));
+  });
 });
