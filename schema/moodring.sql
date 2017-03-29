@@ -20,14 +20,6 @@ SET row_security = off;
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
-
 SET search_path = public, pg_catalog;
 
 SET default_tablespace = '';
@@ -44,70 +36,45 @@ CREATE TABLE instruction (
 );
 
 
-ALTER TABLE instruction OWNER TO gbowner;
-
 --
 -- Name: user; Type: TABLE; Schema: public; Owner: gbowner
 --
 
-CREATE TABLE user (
+CREATE TABLE "user" (
     user_id integer NOT NULL,
-    identifier text,
-    "pixel_id" integer
+    identifier text NOT NULL,
+    pixel_id integer
 );
 
-
-ALTER TABLE user OWNER TO gbowner;
-
 --
--- Name: user_id_seq; Type: SEQUENCE; Schema: public; Owner: gbowner
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: gbowner
 --
 
-CREATE SEQUENCE user_id_seq
+CREATE SEQUENCE users_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE user_id_seq OWNER TO gbowner;
-
 --
--- Name: user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: gbowner
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: gbowner
 --
 
-ALTER SEQUENCE user_id_seq OWNED BY user.user_id;
+ALTER SEQUENCE users_id_seq OWNED BY "user".user_id;
 
 
 --
 -- Name: user user_id; Type: DEFAULT; Schema: public; Owner: gbowner
 --
 
-ALTER TABLE ONLY user ALTER COLUMN user_id SET DEFAULT nextval('user_id_seq'::regclass);
-
-
---
--- Data for Name: instruction; Type: TABLE DATA; Schema: public; Owner: gbowner
---
-
-COPY instruction (user_id, instruction) FROM stdin;
-\.
-
+ALTER TABLE ONLY "user" ALTER COLUMN user_id SET DEFAULT nextval('users_id_seq'::regclass);
 
 --
--- Data for Name: user; Type: TABLE DATA; Schema: public; Owner: gbowner
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: gbowner
 --
 
-COPY user (user_id, email, "pixelId") FROM stdin;
-\.
-
-
---
--- Name: user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: gbowner
---
-
-SELECT pg_catalog.setval('user_id_seq', 1, false);
+SELECT pg_catalog.setval('users_id_seq', 1, true);
 
 
 --
@@ -119,11 +86,11 @@ ALTER TABLE ONLY instruction
 
 
 --
--- Name: user user_pkey; Type: CONSTRAINT; Schema: public; Owner: gbowner
+-- Name: user users_pkey; Type: CONSTRAINT; Schema: public; Owner: gbowner
 --
 
-ALTER TABLE ONLY user
-    ADD CONSTRAINT user_pkey PRIMARY KEY (user_id);
+ALTER TABLE ONLY "user"
+    ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
 
 
 --
@@ -131,7 +98,7 @@ ALTER TABLE ONLY user
 --
 
 ALTER TABLE ONLY instruction
-    ADD CONSTRAINT instruction_user_id_fkey FOREIGN KEY (user_id) REFERENCES user(user_id);
+    ADD CONSTRAINT instruction_user_id_fkey FOREIGN KEY (user_id) REFERENCES "user"(user_id);
 
 
 --
