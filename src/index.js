@@ -15,6 +15,14 @@ const server = app
   .use(bodyParser.json())
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
 
+function csv(flow) {
+  const bits = [];
+  flow.forEach((i) => {
+    bits.push(...i.color, i.ticks);
+  });
+  return bits.join(',');
+}
+
 app.post('/update', async (req, res) => {
   await db.result(`INSERT INTO instruction (user_id, instruction)
     SELECT user_id, $1 FROM "user" WHERE identifier = $2
@@ -22,6 +30,13 @@ app.post('/update', async (req, res) => {
       req.body.instruction,
       req.body.id,
     ]);
+  const u = await db.oneOrNone('SELECT pixel_id FROM "user" WHERE identifier = $1', [req.body.id]);
+  if (u) {
+    const msg = `${u.pixel_id}\n${csv(req.body.instruction.flow)}`;
+    wss.clients.forEach((client) => {
+      client.send(msg);
+    });
+  }
   res.sendStatus(200);
 });
 
