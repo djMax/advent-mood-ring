@@ -3,6 +3,7 @@ import WebSocket from 'ws';
 import pgp from 'pg-promise';
 import express from 'express';
 import bodyParser from 'body-parser';
+import { packedColors } from './colors';
 
 const PORT = process.env.PORT || 3000;
 const PGURL = process.env.DATABASE_URL || 'postgres://docker:postgis@localhost:5432/moodring'
@@ -63,11 +64,14 @@ app.get('/display', (req, res) => {
 
 const wss = new WebSocket.Server({ server });
 
-wss.on('connection', function connection(ws) {
+wss.on('connection', function connection(client) {
   console.log('Client connected');
 
-  ws.on('message', function incoming(message) {
+  client.on('message', function incoming(message) {
     console.log('received: %s', message);
+    if (message.startsWith('KNOB')) {
+      client.send(`colorTable\n${packedColors()}`);
+    }
   });
 
   getAll().then((users) => {
@@ -80,6 +84,8 @@ wss.on('connection', function connection(ws) {
       });
       parts.push(bits.join(','));
     });
-    ws.send(parts.join('\n'));
+    setTimeout(() => {
+      client.send(parts.join('\n'));
+    }, 1500);
   });
 });
