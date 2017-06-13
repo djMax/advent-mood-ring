@@ -18,10 +18,10 @@ these in the cost above because if you're reading this article you probably have
 
 When you plugin a programmed Mood Ring, the light should glow a white-ish color. if it can't find a saved WiFi network it will advertise itself as an access point called "AdventMoodRing". You should connect to this network with a phone or computer and it should present a "configure wifi screen" like the left screen below. Click on "Configure WiFi" and you'll see a screen like the one on the right (without the lower three fields) where you can choose your WiFi network and enter the WiFi password.
 
-<center>
-  <img alt="ESP8266 WiFi Captive Portal Homepage" src="http://i.imgur.com/YPvW9eql.png" width="300"/>
-  <img alt="ESP8266 WiFi Captive Portal Configuration" src="http://i.imgur.com/oicWJ4gl.png" width="300"/>
-</center>
+<div><center>
+  <img alt="ESP8266 WiFi Captive Portal Homepage" src="http://i.imgur.com/YPvW9eql.png" width="300" style="display:inline"/>
+  <img alt="ESP8266 WiFi Captive Portal Configuration" src="http://i.imgur.com/oicWJ4gl.png" width="300"  style="display:inline"/>
+</center></div>
 
 After that's done, the microcrontroller will restart and the light will go off. Now, when you turn the knob it should change colors
 in a spectrum that looks something like this:
