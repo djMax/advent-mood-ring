@@ -26,7 +26,9 @@ When you plugin a programmed Mood Ring, the light should glow a white-ish color.
 After that's done, the microcrontroller will restart and the light will go off. Now, when you turn the knob it should change colors
 in a spectrum that looks something like this:
 
-![HCL color spectrum](https://raw.githubusercontent.com/d3/d3-interpolate/master/img/hclLong.png)
+<div style="text-align: center">
+<img alt="HCL color spectrum" src="https://raw.githubusercontent.com/d3/d3-interpolate/master/img/hclLong.png" height="10" width="90%"/>
+</div>
 
 Whenever you change the color, the knob will send its state to the server and it will send down changes to the displays.
 
