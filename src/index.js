@@ -68,7 +68,8 @@ const knobs = new Set();
 const colors = {};
 
 function findSpot() {
-  for (let i = 0; i < 25; i += 1) {
+  for (let c = 0; c < 1000000; c += 1) {
+    const i = Math.floor(Math.random() * 25);
     let alreadyThere = false;
     knobs.forEach(c => {
       if (c.index === i) {
