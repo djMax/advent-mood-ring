@@ -17,3 +17,8 @@ for (let i = 0; i < 256; i += 1) {
 export function packedColors() {
   return colors.join('\n');
 }
+
+export function getRgbCsv(level) {
+  const c = color(interp(level / 256));
+  return `${c.r},${c.g},${c.b}`;
+}

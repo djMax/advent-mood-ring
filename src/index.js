@@ -3,7 +3,7 @@ import WebSocket from 'ws';
 import pgp from 'pg-promise';
 import express from 'express';
 import bodyParser from 'body-parser';
-import { packedColors } from './colors';
+import { packedColors, getRgbCsv } from './colors';
 
 const PORT = process.env.PORT || 3000;
 const PGURL = process.env.DATABASE_URL || 'postgres://docker:postgis@localhost:5432/moodring'
@@ -63,29 +63,71 @@ app.get('/display', (req, res) => {
 });
 
 const wss = new WebSocket.Server({ server });
+const displays = new Set();
+const knobs = new Set();
+const colors = {};
+
+function findSpot() {
+  for (let i = 0; i < 25; i += 1) {
+    let alreadyThere = false;
+    knobs.forEach(c => {
+      if (c.index === i) {
+        alreadyThere = true;
+      }
+    });
+    if (!alreadyThere) {
+      return i;
+    }
+  }
+}
 
 wss.on('connection', function connection(client) {
-  console.log('Client connected');
+  console.log('New socket connection');
 
   client.on('message', function incoming(message) {
-    console.log('received: %s', message);
+    if (knobs.has(client)) {
+      console.log(`Knob ${client.index} ${message}`);
+    }
     if (message.startsWith('KNOB')) {
+      client.knobId = message.substring(5);
+      client.index = findSpot();
       client.send(`colorTable\n${packedColors()}`);
+      console.log('Assigning', client.knobId, client.index);
+      knobs.add(client);
+    } else if (message.startsWith('DISPLAY')) {
+      console.log('New display connection');
+      displays.add(client);
+      let parts = []
+      db.manyOrNone('SELECT spot, reading FROM knob_reading')
+        .then((spots) => {
+          for (const p of spots) {
+            parts.push(p.spot);
+            const rgb = getRgbCsv(p.reading);
+            parts.push(`0,0,0,150,${rgb},150`);
+          }
+          console.error('SENDING>>>', parts.join('\n'), '<<<');
+          client.send(parts.join('\n'));
+        });
+    } else if (message.startsWith('S ') && knobs.has(client)) {
+      // Got a new value from a knob
+      const setting = message.substring(2);
+      colors[client.index] = setting;
+      const rgb = getRgbCsv(setting);
+      const instr = `${client.index}\n0,0,0,150,${rgb},150\n`;
+      console.log('Sending', instr);
+      db.result(`INSERT INTO knob_reading (spot, reading)
+    VALUES ($1, $2)
+    ON CONFLICT (spot) DO UPDATE SET reading = $2`, [
+          client.index,
+          setting,
+        ])
+        .catch(console.error);
+      displays.forEach(s => s.send(instr));
     }
   });
 
-  getAll().then((users) => {
-    const parts = [];
-    users.forEach((i) => {
-      parts.push(user.pixel_id);
-      const bits = [];
-      user.instruction.flow.forEach((i) => {
-        bits.push(...i.color, i.ticks);
-      });
-      parts.push(bits.join(','));
-    });
-    setTimeout(() => {
-      client.send(parts.join('\n'));
-    }, 1500);
+  client.on('close', () => {
+    knobs.delete(client);
+    displays.delete(client);
   });
 });
