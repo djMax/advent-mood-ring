@@ -124,8 +124,8 @@ wss.on('connection', function connection(client) {
       displays.forEach(s => s.send(instr));
       knobs.forEach((k) => {
         if (k !== client) {
-          console.log('Echo', k.knobId, getRgbHex(setting));
-          k.send(`!${getRgbHex(setting)}`);
+          console.log('Echo', k.knobId, setting);
+          k.send(`!${setting}`);
           setTimeout(() => k.send('!'), 2000);
         }
       })
