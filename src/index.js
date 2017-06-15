@@ -86,9 +86,6 @@ wss.on('connection', function connection(client) {
   console.log('New socket connection');
 
   client.on('message', function incoming(message) {
-    if (knobs.has(client)) {
-      console.log(`Knob ${client.index} ${message}`);
-    }
     if (message.startsWith('KNOB')) {
       client.knobId = message.substring(5);
       client.index = findSpot();
@@ -111,6 +108,7 @@ wss.on('connection', function connection(client) {
         });
     } else if (message.startsWith('S ') && knobs.has(client)) {
       // Got a new value from a knob
+      console.log(`Knob ${client.index} ${message}`);
       const setting = message.substring(2);
       colors[client.index] = setting;
       const rgb = getRgbCsv(setting);
@@ -126,6 +124,7 @@ wss.on('connection', function connection(client) {
       displays.forEach(s => s.send(instr));
       knobs.forEach((k) => {
         if (k !== client) {
+          console.log('Echo', k.knobId, getRgbHex(setting));
           k.send(`!${getRgbHex(setting)}`);
           setTimeout(() => k.send('!'), 2000);
         }
