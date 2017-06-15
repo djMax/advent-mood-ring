@@ -66,8 +66,12 @@ const wss = new WebSocket.Server({ server });
 const displays = new Set();
 const knobs = new Set();
 const colors = {};
+const hints = {};
 
-function findSpot() {
+function findSpot(id) {
+  if (hints[id] && !knobs.find(c => c.index === hints[id])) {
+    return hints[id];
+  }
   for (let c = 0; c < 1000000; c += 1) {
     const i = Math.floor(Math.random() * 25);
     let alreadyThere = false;
@@ -77,6 +81,7 @@ function findSpot() {
       }
     });
     if (!alreadyThere) {
+      hints[id] = i;
       return i;
     }
   }
@@ -87,8 +92,11 @@ wss.on('connection', function connection(client) {
 
   client.on('message', function incoming(message) {
     if (message.startsWith('KNOB')) {
+      client.keepAlive = setInterval(() => {
+        try { client.send('-'); } catch (e) {}
+      }, 20000);
       client.knobId = message.substring(5);
-      client.index = findSpot();
+      client.index = findSpot(client.knobId);
       client.send(`colorTable\n${packedColors()}`);
       console.log('Assigning', client.knobId, client.index);
       knobs.add(client);
@@ -141,5 +149,8 @@ wss.on('connection', function connection(client) {
   client.on('close', () => {
     knobs.delete(client);
     displays.delete(client);
+    if (client.keepAlive) {
+      clearInterval(client.keepAlive);
+    }
   });
 });
