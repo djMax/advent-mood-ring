@@ -22,3 +22,7 @@ export function getRgbCsv(level) {
   const c = color(interp(level / 256));
   return `${c.r},${c.g},${c.b}`;
 }
+
+export function getRgbHex(level) {
+  return colors[level];
+}

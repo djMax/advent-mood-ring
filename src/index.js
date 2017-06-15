@@ -3,7 +3,7 @@ import WebSocket from 'ws';
 import pgp from 'pg-promise';
 import express from 'express';
 import bodyParser from 'body-parser';
-import { packedColors, getRgbCsv } from './colors';
+import { packedColors, getRgbCsv, getRgbHex } from './colors';
 
 const PORT = process.env.PORT || 3000;
 const PGURL = process.env.DATABASE_URL || 'postgres://docker:postgis@localhost:5432/moodring'
@@ -124,6 +124,12 @@ wss.on('connection', function connection(client) {
         ])
         .catch(console.error);
       displays.forEach(s => s.send(instr));
+      knobs.forEach((k) => {
+        if (k !== client) {
+          k.send(`!${getRgbHex(setting)}`);
+          setTimeout(() => k.send('!'), 2000);
+        }
+      })
     }
   });
 
