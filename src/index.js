@@ -124,9 +124,15 @@ wss.on('connection', function connection(client) {
       displays.forEach(s => s.send(instr));
       knobs.forEach((k) => {
         if (k !== client) {
-          console.log('Echo', k.knobId, setting);
-          k.send(`!${setting}`);
-          setTimeout(() => k.send('!'), 2000);
+          try {
+            console.log('Echo', k.knobId, setting);
+            k.send(`!${setting}`);
+            setTimeout(() => {
+              try { k.send('!'); } catch (e) {}
+            }, 2000);
+          } catch (e2) {
+
+          }
         }
       })
     }
