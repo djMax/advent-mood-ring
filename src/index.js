@@ -129,7 +129,7 @@ wss.on('connection', function connection(client) {
             k.send(`!${setting}`);
             setTimeout(() => {
               try { k.send('!'); } catch (e) {}
-            }, 2000);
+            }, 5000);
           } catch (e2) {
 
           }
