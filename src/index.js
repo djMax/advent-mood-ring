@@ -68,8 +68,18 @@ const knobs = new Set();
 const colors = {};
 const hints = {};
 
+function knobsHasIndex(ix) {
+  let found = false;
+  knobs.forEach(c => {
+    if (c.index === ix) {
+      found = true;
+    }
+  });
+  return found;
+}
+
 function findSpot(id) {
-  if (hints[id] && !knobs.find(c => c.index === hints[id])) {
+  if (hints[id] && !knobsHasIndex(hints[id])) {
     return hints[id];
   }
   for (let c = 0; c < 1000000; c += 1) {
